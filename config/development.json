@@ -1,0 +1,9 @@
+{
+    "database": "vidly_dev",
+    "username": "root",
+    "host": "localhost",
+    "port": 3306,
+    "password": "",
+    "dialect": "mysql",
+    "nosql_uri": "mongodb://localhost/vidly_dev"
+}
