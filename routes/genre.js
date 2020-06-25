@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db/db.js')
 const infoDebugger = require('debug')('app:info')
 const configDebugger = require('debug')('app:config')
 const errDebugger = require('debug')('app:err')
@@ -40,10 +41,17 @@ async function createGenre(genreObj){
  * Fetch all genres
  * @return { Array } Array of Genre objects
  */
-router.get('/', (req, res) => {
-    Genre.find()
-        .then( genres => res.send(genres))
-        .catch( err => errDebugger(err))
+router.get('/', async (req, res) => {
+    infoDebugger('GETTING ALL GENRES')
+    try { 
+        const genres = await Genre.find().sort('name');  
+        res.send(genres)
+    }
+    catch (ex) {
+        errDebugger(ex);
+        return
+    }
+    
 });
 
 /**
@@ -51,14 +59,16 @@ router.get('/', (req, res) => {
  * @param { String } id query string | MongoDB ID for the requested genre
  * @return { Object } Genre Object
  */
-router.get('/:id', (req,res) => {
-    Genre.findById(req.params.id)
-        .then(genre => {
-            if (!genre)
-                res.sendStatus(404);
-            res.send(genre);
-        })
-        .catch(err => errDebugger(err))
+router.get('/:id', async (req,res) => {
+    try {
+        const genre = await Genre.findById(req.params.id);
+        if (!genre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
+        res.send(genre);
+    }
+    catch (ex) {
+        errDebugger(ex);
+        return res.status(500).send('Error occurred while fetching genre.');
+    }
 });
 
 /**
@@ -71,7 +81,10 @@ router.post('/', (req,res) => {
     infoDebugger('New Genre Object:',newGenre)
     createGenre(newGenre)
         .then( genre => res.send(genre) )
-        .catch( err => errDebugger(err) )
+        .catch( err => {
+            errDebugger(err);
+            res.status(500).send('Error occurred while POST-ing genre.');
+        } )
 });
 
 /**
@@ -90,8 +103,7 @@ router.put('/:id', (req,res) => {
     }
     Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})
         .then( updatedGenre => {
-            if (!updatedGenre)
-                res.sendStatus(404);
+            if (!updatedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
             res.send(updatedGenre);
         } )
         .catch( err => errDebugger(err));
@@ -105,8 +117,7 @@ router.put('/:id', (req,res) => {
 router.delete('/:id', (req,res) => {
     Genre.findByIdAndRemove({ _id: req.params.id })
         .then( deletedGenre => {
-            if (!deletedGenre)
-                res.sendStatus(404);
+            if (!deletedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
             res.send(deletedGenre);
         })
         .catch( err => errDebugger(err));
