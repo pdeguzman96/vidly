@@ -15,43 +15,6 @@ mongoose.connect(config.get('nosql_uri'), mongoConfig)
 
 mongoose.set('useFindAndModify', false);
 
-const genreSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    created_at: { 
-        type: Date,
-        default: Date.now()
-    },
-    updated_at: Date
-});
-
-// Compiline schema into a model
-const Genre = new mongoose.model("Genre", genreSchema);
-
-/**
- * Utility Function to create a new instance of a Genre
- * @param { Object } genreObj An object with property name to indicate genre name
- */
-async function createGenre(genreObj){
-    try {
-        const newGenre = new Genre(genreObj);
-        const result = await newGenre.save();
-        infoDebugger('New Genre Created...\n',result);
-        return result
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return
-    }
-}
-
-
-exports.Genre = Genre
-exports.createGenre = createGenre
-
-
 // // ==========Sequelize===========
 // const Sequelize = require('sequelize');
 // const config = require('config')

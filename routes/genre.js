@@ -1,17 +1,49 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/db.js');
 const infoDebugger = require('debug')('app:info')
 const configDebugger = require('debug')('app:config')
 const errDebugger = require('debug')('app:err')
 const mongoose = require('mongoose')
+
+// Defining Schema
+const genreSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    created_at: { 
+        type: Date,
+        default: Date.now()
+    },
+    updated_at: Date
+});
+
+// Compiline schema into a model
+const Genre = new mongoose.model("Genre", genreSchema);
+
+/**
+ * Utility Function to create a new instance of a Genre
+ * @param { Object } genreObj An object with property name to indicate genre name
+ */
+async function createGenre(genreObj){
+    try {
+        const newGenre = new Genre(genreObj);
+        const result = await newGenre.save();
+        infoDebugger('New Genre Created...\n',result);
+        return result
+    }
+    catch (ex) {
+        errDebugger(ex);
+        return
+    }
+}
 
 /**
  * Fetch all genres
  * @return { Array } Array of Genre objects
  */
 router.get('/', (req, res) => {
-    db.Genre.find()
+    Genre.find()
         .then( genres => res.send(genres))
         .catch( err => errDebugger(err))
 });
@@ -22,7 +54,7 @@ router.get('/', (req, res) => {
  * @return { Object } Genre Object
  */
 router.get('/:id', (req,res) => {
-    db.Genre.findById(req.params.id)
+    Genre.findById(req.params.id)
         .then(genre => {
             if (!genre)
                 res.sendStatus(404);
@@ -39,7 +71,7 @@ router.get('/:id', (req,res) => {
 router.post('/', (req,res) => {
     const newGenre = {name: req.body.name}
     infoDebugger('New Genre Object:',newGenre)
-    db.createGenre(newGenre)
+    createGenre(newGenre)
         .then( genre => res.send(genre) )
         .catch( err => errDebugger(err) )
 });
@@ -58,7 +90,7 @@ router.put('/:id', (req,res) => {
             updated_at: Date.now()
         }
     }
-    db.Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})
+    Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})
         .then( updatedGenre => {
             if (!updatedGenre)
                 res.sendStatus(404);
@@ -73,7 +105,7 @@ router.put('/:id', (req,res) => {
  * @return { Object } Deleted Genre object
  */
 router.delete('/:id', (req,res) => {
-    db.Genre.findByIdAndRemove({ _id: req.params.id })
+    Genre.findByIdAndRemove({ _id: req.params.id })
         .then( deletedGenre => {
             if (!deletedGenre)
                 res.sendStatus(404);
