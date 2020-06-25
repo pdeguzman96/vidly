@@ -5,21 +5,19 @@ const configDebugger = require('debug')('app:config')
 const errDebugger = require('debug')('app:err')
 const mongoose = require('mongoose')
 
-// Defining Schema
-const genreSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    created_at: { 
-        type: Date,
-        default: Date.now()
-    },
-    updated_at: Date
-});
-
 // Compiline schema into a model
-const Genre = new mongoose.model("Genre", genreSchema);
+const Genre = new mongoose.model("Genre", 
+    new mongoose.Schema({
+        name: {
+            type: String,
+            required: true
+        },
+        created_at: { 
+            type: Date,
+            default: Date.now()
+        },
+        updated_at: Date
+    }));
 
 /**
  * Utility Function to create a new instance of a Genre
