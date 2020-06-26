@@ -1,14 +1,17 @@
+// APIs
 const express = require('express');
 const router = express.Router();
+// DB
 const db = require('../db/db.js')
+const mongoose = require('mongoose')
+// Logging
 const infoDebugger = require('debug')('app:info')
 const configDebugger = require('debug')('app:config')
 const errDebugger = require('debug')('app:err')
-const mongoose = require('mongoose')
+// Input Validation
 const joi = require('../joi_schemas')
-const Joi = require('@hapi/joi')
 
-// Compiline schema into a model
+// Compile schema into a model
 const Genre = new mongoose.model("Genre", 
     new mongoose.Schema({
         name: {
