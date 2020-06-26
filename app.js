@@ -1,5 +1,4 @@
 const express = require('express');
-const joi = require('joi');
 const genre = require('./routes/genre')
 const morgan = require('morgan')
 const infoDebugger = require('debug')('app:info')
@@ -12,7 +11,7 @@ app.use('/genres', genre)
 // Listen on a port
 // Env var: PORT
 infoDebugger(`APP ENV: ${app.get('env')}`);
-if (app.get('env') === 'production' || app.get('env') === 'stage') {
+if (app.get('env') === 'development' || app.get('env') === 'stage') {
     infoDebugger('Enabling Morgan...');
     app.use(morgan);
 }

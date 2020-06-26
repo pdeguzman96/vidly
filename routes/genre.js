@@ -5,6 +5,8 @@ const infoDebugger = require('debug')('app:info')
 const configDebugger = require('debug')('app:config')
 const errDebugger = require('debug')('app:err')
 const mongoose = require('mongoose')
+const joi = require('../joi_schemas')
+const Joi = require('@hapi/joi')
 
 // Compiline schema into a model
 const Genre = new mongoose.model("Genre", 
@@ -19,23 +21,6 @@ const Genre = new mongoose.model("Genre",
         },
         updated_at: Date
     }));
-
-/**
- * Utility Function to create a new instance of a Genre
- * @param { Object } genreObj An object with property name to indicate genre name
- */
-async function createGenre(genreObj){
-    try {
-        const newGenre = new Genre(genreObj);
-        const result = await newGenre.save();
-        infoDebugger('New Genre Created...\n',result);
-        return result
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return
-    }
-}
 
 /**
  * Fetch all genres
@@ -60,6 +45,11 @@ router.get('/', async (req, res) => {
  * @return { Object } Genre Object
  */
 router.get('/:id', async (req,res) => {
+    // Joi Validation
+    const { error, value } = joi.genre_id_schema.validate(req.params);
+    infoDebugger(value);
+    if (error) return res.status(400).send(error);
+
     try {
         const genre = await Genre.findById(req.params.id);
         if (!genre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
@@ -71,20 +61,30 @@ router.get('/:id', async (req,res) => {
     }
 });
 
+// TODO: implement joi to evaluate request
 /**
  * POST a new genre in the database
  * @param { String } req.body.name json body param | The name of the genre to POST 
  * @return { Object } New Genre Object
  */
-router.post('/', (req,res) => {
-    const newGenre = {name: req.body.name}
-    infoDebugger('New Genre Object:',newGenre)
-    createGenre(newGenre)
-        .then( genre => res.send(genre) )
-        .catch( err => {
-            errDebugger(err);
-            res.status(500).send('Error occurred while POST-ing genre.');
-        } )
+router.post('/', async (req,res) => {
+    // Joi Validation
+    const { error, value } = joi.genre_name_schema.validate(req.body);
+    infoDebugger(value);
+    if (error) return res.status(400).send(error);
+
+    try {
+        const newGenre = new Genre({
+            name: req.body.name
+        });
+        const result = await newGenre.save();
+        infoDebugger('New Genre Created...\n',result);
+        res.send(result)
+    }
+    catch (ex) {
+        errDebugger(ex);
+        res.status(500).send(ex)
+    }
 });
 
 /**
@@ -94,6 +94,13 @@ router.post('/', (req,res) => {
  * @return { Object } Updated Genre Object
  */
 router.put('/:id', (req,res) => {
+    // Joi Validation - ID
+    let id_res = joi.genre_id_schema.validate(req.params);
+    if (id_res.error) return res.status(400).send(id_res.error);
+    // Joi Validation - Name
+    let name_res = joi.genre_name_schema.validate(req.body);
+    if (name_res.error) return res.status(400).send(name_res.error);
+    
     const updateTarget = {_id : req.params.id}
     const updateObj = {
         $set: {
@@ -115,6 +122,11 @@ router.put('/:id', (req,res) => {
  * @return { Object } Deleted Genre object
  */
 router.delete('/:id', (req,res) => {
+    // Joi Validation - ID
+    const { error, value } = joi.genre_id_schema.validate(req.params);
+    infoDebugger(value);
+    if (error) return res.status(400).send(error);
+
     Genre.findByIdAndRemove({ _id: req.params.id })
         .then( deletedGenre => {
             if (!deletedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
