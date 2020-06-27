@@ -2,42 +2,27 @@
 const express = require('express');
 const router = express.Router();
 // DB
-const db = require('../db/db.js')
-const mongoose = require('mongoose')
+const { Genre } = require('../models/genres');
+const db = require('../db/db');
 // Logging
-const infoDebugger = require('debug')('app:info')
-const configDebugger = require('debug')('app:config')
-const errDebugger = require('debug')('app:err')
+const infoDebugger = require('debug')('app:info');
+const errDebugger = require('debug')('app:err');
 // Input Validation
-const joi = require('../joi_schemas')
-
-// Compile schema into a model
-const Genre = new mongoose.model("Genre", 
-    new mongoose.Schema({
-        name: {
-            type: String,
-            required: true
-        },
-        created_at: { 
-            type: Date,
-            default: Date.now()
-        },
-        updated_at: Date
-    }));
+const joi = require('../joi_schemas');
 
 /**
  * Fetch all genres
  * @return { Array } Array of Genre objects
  */
 router.get('/', async (req, res) => {
-    infoDebugger('GETTING ALL GENRES')
+    infoDebugger('Getting all genres...')
     try { 
         const genres = await Genre.find().sort('name');  
-        res.send(genres)
+        return res.send(genres);
     }
     catch (ex) {
         errDebugger(ex);
-        res.status(500).send(ex)
+        return res.status(500).send(ex);
     }
     
 });
@@ -108,7 +93,7 @@ router.put('/:id', (req,res) => {
     const updateObj = {
         $set: {
             name: req.body.name,
-            updated_at: Date.now()
+            updatedAt: Date.now()
         }
     }
     Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})

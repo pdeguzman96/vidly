@@ -1,51 +1,28 @@
 // APIs
 const express = require('express');
 const router = express.Router();
-// DB
-const db = require('../db/db.js')
-const mongoose = require('mongoose')
+// DB Model
+const { Customer } = require('../models/customers');
+const db = require('../db/db');
 // Logging
-const infoDebugger = require('debug')('app:info')
-const configDebugger = require('debug')('app:config')
-const errDebugger = require('debug')('app:err')
+const infoDebugger = require('debug')('app:info');
+const errDebugger = require('debug')('app:err');
 // Input Validation
-const joi = require('../joi_schemas')
-
-// Compile schema into a model
-const Customer = new mongoose.model("Customer", 
-    new mongoose.Schema({
-        name: {
-            type: String,
-            required: true
-        },
-        isGold: {
-            type: Boolean,
-            required: true,
-            default: false
-        },
-        phone: {
-            type: String
-        },
-        created_at: { 
-            type: Date,
-            default: Date.now()
-        },
-        updated_at: Date
-    }));
+const joi = require('../joi_schemas');
 
 /**
  * Get all customers
  * @return { Array } Array of Customer objects
  */
-router.get('/', async(req, res) => {
+router.get('/', async (req, res) => {
     infoDebugger('Getting all customers...');
     try {
         const customers = await Customer.find().sort('name');
-        res.send(customers);
+        return res.send(customers);
     }
     catch (ex) {
         errDebugger(ex);
-        res.status(500).send(ex);
+        return res.status(500).send(ex);
     }
 })
 
@@ -125,6 +102,7 @@ router.put('/:id', async (req, res) => {
         customer.name = req.body.name || customer.name;
         if (req.body.isGold !== undefined) customer.isGold = req.body.isGold;
         customer.phone = req.body.phone || customer.phone;
+        customer.updatedAt = Date.now();
         const updatedCustomer = await customer.save();
         res.send(updatedCustomer);
     }

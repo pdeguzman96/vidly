@@ -1,11 +1,10 @@
 const express = require('express');
-const morgan = require('morgan')
-const infoDebugger = require('debug')('app:info')
+const infoDebugger = require('debug')('app:info');
 // Middleware and Request Pipeline...
 // Request----json()---route()---> Response
+const genre = require('./routes/genre');
+const customer = require('./routes/customer');
 const app = express();
-const genre = require('./routes/genre')
-const customer = require('./routes/customer')
 
 app.use(express.json()); // Allowing use of json in request. sets req.body as json
 app.use('/genres', genre)
