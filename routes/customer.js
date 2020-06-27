@@ -99,6 +99,8 @@ router.put('/:id', async (req, res) => {
 
     try {
         const customer = await Customer.findById(req.params.id);
+        if (!customer) return res.status(404).send(`Customer with ID ${req.params.id} does not exist.`)
+
         customer.name = req.body.name || customer.name;
         if (req.body.isGold !== undefined) customer.isGold = req.body.isGold;
         customer.phone = req.body.phone || customer.phone;

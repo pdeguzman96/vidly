@@ -4,11 +4,13 @@ const infoDebugger = require('debug')('app:info');
 // Request----json()---route()---> Response
 const genre = require('./routes/genre');
 const customer = require('./routes/customer');
+const movie = require('./routes/movie');
 const app = express();
 
 app.use(express.json()); // Allowing use of json in request. sets req.body as json
-app.use('/genres', genre)
-app.use('/customers', customer)
+app.use('/genres', genre);
+app.use('/customers', customer);
+app.use('/movies', movie);
 
 // Listen on a port
 // Env var: PORT
