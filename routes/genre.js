@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
     }
     catch (ex) {
         errDebugger(ex);
-        return
+        res.status(500).send(ex)
     }
     
 });
@@ -49,7 +49,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req,res) => {
     // Joi Validation
-    const { error, value } = joi.genre_id_schema.validate(req.params);
+    const { error, value } = joi.basic_id_schema.validate(req.params);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
@@ -98,7 +98,7 @@ router.post('/', async (req,res) => {
  */
 router.put('/:id', (req,res) => {
     // Joi Validation - ID
-    let id_res = joi.genre_id_schema.validate(req.params);
+    let id_res = joi.basic_id_schema.validate(req.params);
     if (id_res.error) return res.status(400).send(id_res.error);
     // Joi Validation - Name
     let name_res = joi.genre_name_schema.validate(req.body);
@@ -126,7 +126,7 @@ router.put('/:id', (req,res) => {
  */
 router.delete('/:id', (req,res) => {
     // Joi Validation - ID
-    const { error, value } = joi.genre_id_schema.validate(req.params);
+    const { error, value } = joi.basic_id_schema.validate(req.params);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 

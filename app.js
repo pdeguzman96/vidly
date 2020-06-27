@@ -14,10 +14,7 @@ app.use('/customers', customer)
 // Listen on a port
 // Env var: PORT
 infoDebugger(`APP ENV: ${app.get('env')}`);
-if (app.get('env') === 'development' || app.get('env') === 'stage') {
-    infoDebugger('Enabling Morgan...');
-    app.use(morgan("default"));
-}
+
 const port = process.env.PORT || 3500
 app.listen(port, () => infoDebugger(`Listening on port ${port}`))
 
