@@ -58,7 +58,9 @@ router.get('/', async(req, res) => {
  */
 router.post('/', async(req, res) => {
     infoDebugger('Creating new customer');
-    // TODO: Add joi input val
+    const { error, value } = joi.cust_create_schema.validate(req.body);
+    infoDebugger(value);
+    if (error) return res.status(400).send(error);
 
     try {
         const newCustomer = Customer({
