@@ -17,12 +17,14 @@ const Movie = new mongoose.model("Movie",
         numberInStock: {
             type: Number,
             default: 0,
-            min: 0
+            min: 0,
+            max: 300
         },
         dailyRentalRate: {
             type: Number,
             default: 0,
-            min: 0
+            min: 0,
+            max: 300
         },
         createdAt: { 
             type: Date,
