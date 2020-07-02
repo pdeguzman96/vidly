@@ -49,7 +49,6 @@ router.get('/:id', async (req,res) => {
     }
 });
 
-// TODO: implement joi to evaluate request
 /**
  * POST a new genre in the database
  * @param { String } req.body.name json body param | The name of the genre to POST 
