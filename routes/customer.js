@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) =>{
     infoDebugger('Getting single customer');
-    const {error, value } = joi.basic_id_schema.validate(req.params);
+    const {error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
     infoDebugger(value);
 
@@ -58,7 +58,7 @@ router.get('/:id', async (req, res) =>{
  */
 router.post('/', async(req, res) => {
     infoDebugger('Creating new customer');
-    const { error, value } = joi.cust_create_schema.validate(req.body);
+    const { error, value } = joi.custCreateSchema.validate(req.body);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
@@ -89,11 +89,11 @@ router.post('/', async(req, res) => {
 router.put('/:id', async (req, res) => {
     infoDebugger('Updating existing customer');
     // Validating the body
-    const bodyValidation = joi.cust_update_schema.validate(req.body);
+    const bodyValidation = joi.custUpdateSchema.validate(req.body);
     if (bodyValidation.error) return res.status(400).send(bodyValidation.error);
     infoDebugger(bodyValidation.value);
     // Validating the parameter
-    const idValidation = joi.basic_id_schema.validate(req.params);
+    const idValidation = joi.basicIdSchema.validate(req.params);
     if (idValidation.error) return res.status(400).send(idValidation.error);
     infoDebugger(idValidation.value);
 
@@ -123,7 +123,7 @@ router.put('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
     infoDebugger('Deleting existing customer');
-    const { error, value } = joi.basic_id_schema.validate(req.params);
+    const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
     infoDebugger(value);
 

@@ -1,40 +1,40 @@
 const Joi = require('@hapi/joi')
 
-const basic_id_schema = Joi.object({
+const basicIdSchema = Joi.object({
     id: Joi.string()
         .alphanum()
         .length(24)
         .required()
 });
 
-const genre_name_schema = Joi.object({
+const genreNameSchema = Joi.object({
     name: Joi.string()
         .min(2)
         .max(20)
         .required()
 });
 
-const cust_create_schema = Joi.object({
+const custCreateSchema = Joi.object({
     name: Joi.string()
         .required(),
     isGold: Joi.boolean(),
     phone: Joi.string()
 });
 
-const cust_update_schema = Joi.object({
+const custUpdateSchema = Joi.object({
     name: Joi.string(),
     isGold: Joi.boolean(),
     phone: Joi.string()
 });
 
-const movie_update_schema = Joi.object({
+const movieUpdateSchema = Joi.object({
     title: Joi.string(),
     genreId: Joi.string().alphanum().length(24),
     numberInStock: Joi.number().min(0),
     dailyRentalRate: Joi.number().min(0)
 });
 
-const movie_create_schema = Joi.object({
+const movieCreateSchema = Joi.object({
     title: Joi.string().required(),
     genreId: Joi.string().alphanum().length(24).required(),
     numberInStock: Joi.number().min(0),
@@ -46,10 +46,10 @@ const rentalCreateSchema = Joi.object({
     movieId: Joi.string().alphanum().length(24).required()
 })
 
-module.exports.basic_id_schema = basic_id_schema
-module.exports.genre_name_schema = genre_name_schema
-module.exports.cust_create_schema = cust_create_schema
-module.exports.cust_update_schema = cust_update_schema
-module.exports.movie_create_schema = movie_create_schema
-module.exports.movie_update_schema = movie_update_schema
+module.exports.basicIdSchema = basicIdSchema
+module.exports.genreNameSchema = genreNameSchema
+module.exports.custCreateSchema = custCreateSchema
+module.exports.custUpdateSchema = custUpdateSchema
+module.exports.movieCreateSchema = movieCreateSchema
+module.exports.movieUpdateSchema = movieUpdateSchema
 module.exports.rentalCreateSchema = rentalCreateSchema

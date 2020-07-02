@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req,res) => {
     // Joi Validation
-    const { error, value } = joi.basic_id_schema.validate(req.params);
+    const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
@@ -56,7 +56,7 @@ router.get('/:id', async (req,res) => {
  */
 router.post('/', async (req,res) => {
     // Joi Validation
-    const { error, value } = joi.genre_name_schema.validate(req.body);
+    const { error, value } = joi.genreNameSchema.validate(req.body);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
@@ -82,10 +82,10 @@ router.post('/', async (req,res) => {
  */
 router.put('/:id', (req,res) => {
     // Joi Validation - ID
-    let id_res = joi.basic_id_schema.validate(req.params);
+    let id_res = joi.basicIdSchema.validate(req.params);
     if (id_res.error) return res.status(400).send(id_res.error);
     // Joi Validation - Name
-    let name_res = joi.genre_name_schema.validate(req.body);
+    let name_res = joi.genreNameSchema.validate(req.body);
     if (name_res.error) return res.status(400).send(name_res.error);
     
     const updateTarget = {_id : req.params.id}
@@ -110,7 +110,7 @@ router.put('/:id', (req,res) => {
  */
 router.delete('/:id', (req,res) => {
     // Joi Validation - ID
-    const { error, value } = joi.basic_id_schema.validate(req.params);
+    const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
