@@ -39,6 +39,11 @@ const movie_create_schema = Joi.object({
     genreId: Joi.string().alphanum().length(24).required(),
     numberInStock: Joi.number().min(0),
     dailyRentalRate: Joi.number().min(0)
+});
+
+const rentalCreateSchema = Joi.object({
+    customerId: Joi.string().alphanum().length(24).required(),
+    movieId: Joi.string().alphanum().length(24).required()
 })
 
 module.exports.basic_id_schema = basic_id_schema
@@ -47,3 +52,4 @@ module.exports.cust_create_schema = cust_create_schema
 module.exports.cust_update_schema = cust_update_schema
 module.exports.movie_create_schema = movie_create_schema
 module.exports.movie_update_schema = movie_update_schema
+module.exports.rentalCreateSchema = rentalCreateSchema

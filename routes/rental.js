@@ -36,7 +36,11 @@ router.get('/', async (req, res) => {
  */
 router.post('/', async (req, res) => {
     infoDebugger('Creating new rental...');
-    
+    // Joi input validation
+    const { error, value } = joi.rentalCreateSchema.validate(req.body);
+    if (error) return res.status(400).send(error);
+    infoDebugger(value);
+
     // Checking if movie exists and contains stock
     const selectedMovie = await Movie.findById(req.body.movieId);
     if (!selectedMovie) return res.status(404).send(`Movie with ID ${req.body.movieId} does not exist.`);
