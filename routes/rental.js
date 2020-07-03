@@ -5,12 +5,16 @@ const router = express.Router();
 const { Rental } = require('../models/rentals');
 const { Movie } = require('../models/movies');
 const { Customer } = require('../models/customers');
+const mongoose = require('mongoose');
 const db = require('../db/db');
 // Logging
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
+// Two-Phase Commits
+const Fawn = require('fawn');
+Fawn.init(mongoose);
 
 /**
  * Get all rentals
@@ -64,17 +68,22 @@ router.post('/', async (req, res) => {
                 isGold: selectedCustomer.isGold
             }
         });
-        const createdRental = await newRental.save();
-        infoDebugger('New Rental Created...\n',createdRental);
-        
-        // Decrementing the Movie stock count
-        selectedMovie.numberInStock--
-        const updatedMovie = await selectedMovie.save();
 
-        res.send({
-            "newRental": createdRental,
-            "updatedMovie": updatedMovie
-        });
+        try {
+            new Fawn.Task()
+                .save('rentals', newRental)
+                .update('movies', 
+                    {_id: selectedMovie._id}, 
+                    {$inc: { numberInStock: -1 }})
+                .run();
+            res.send(newRental);
+        }
+        catch (ex) {
+            errDebugger(ex);
+            return res.status(500).send(ex);
+        }
+
+        infoDebugger('New Rental Created...\n',newRental);
         return 
     }
     catch (ex) {
