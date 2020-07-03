@@ -2,9 +2,7 @@ const Joi = require('@hapi/joi')
 Joi.objectId = require('joi-objectid')(Joi);
 
 const basicIdSchema = Joi.object({
-    id: Joi.string()
-        .alphanum()
-        .length(24)
+    id: Joi.objectId()
         .required()
 });
 
@@ -47,6 +45,12 @@ const rentalCreateSchema = Joi.object({
     movieId: Joi.objectId().required()
 })
 
+const userCreateSchema = Joi.object({
+    name: Joi.string().required().min(3).max(50),
+    email: Joi.string().required().min(5).max(255).email(),
+    password: Joi.string().required().min(4).max(255)
+})
+
 module.exports.basicIdSchema = basicIdSchema
 module.exports.genreNameSchema = genreNameSchema
 module.exports.custCreateSchema = custCreateSchema
@@ -54,3 +58,4 @@ module.exports.custUpdateSchema = custUpdateSchema
 module.exports.movieCreateSchema = movieCreateSchema
 module.exports.movieUpdateSchema = movieUpdateSchema
 module.exports.rentalCreateSchema = rentalCreateSchema
+module.exports.userCreateSchema = userCreateSchema
