@@ -4,8 +4,9 @@ This repo contains the code for a simple Node.js app that I build alongside Mosh
 
 ## Environment Variables
 To properly use this app, please set the following environment variables...
-- PORT: (Optional) Whatever port you want to use to run the app. Defaults to 3000.
-- DEBUG: I recommend that you set this to app:* (in Terminal, run `export DEBUG=app:*`)
+- vidly_jwtPrivateKey: (REQUIRED) Set a private key locally for generating JWTs for authenticated users. 
+- PORT: (Optional) Whatever port you want to use to run the app. Defaults to 5123.
+- DEBUG: (Optional) I recommend that you set this to app:* (in Terminal, run `export DEBUG=app:*`)
     - I use different levels of logging using the debug npm package. Setting this variable will show all levels of logging (info, error, config)
 - NODE_ENV: (Optional) Defaults to "development". Although it doesn't really matter since this is a pet project, it's possible to choose one of development, stage, production.
     - The npm config package is used to select the right `.config` file in the /config/ directory depending on this environment variable.
