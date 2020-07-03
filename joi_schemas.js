@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi')
+Joi.objectId = require('joi-objectid')(Joi);
 
 const basicIdSchema = Joi.object({
     id: Joi.string()
@@ -29,21 +30,21 @@ const custUpdateSchema = Joi.object({
 
 const movieUpdateSchema = Joi.object({
     title: Joi.string(),
-    genreId: Joi.string().alphanum().length(24),
+    genreId: Joi.objectId(),
     numberInStock: Joi.number().min(0),
     dailyRentalRate: Joi.number().min(0)
 });
 
 const movieCreateSchema = Joi.object({
     title: Joi.string().required(),
-    genreId: Joi.string().alphanum().length(24).required(),
+    genreId: Joi.objectId().required(),
     numberInStock: Joi.number().min(0),
     dailyRentalRate: Joi.number().min(0)
 });
 
 const rentalCreateSchema = Joi.object({
-    customerId: Joi.string().alphanum().length(24).required(),
-    movieId: Joi.string().alphanum().length(24).required()
+    customerId: Joi.objectId().required(),
+    movieId: Joi.objectId().required()
 })
 
 module.exports.basicIdSchema = basicIdSchema
