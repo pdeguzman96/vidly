@@ -9,6 +9,8 @@ const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
+// Lodash
+const _ = require('lodash');
 
 /**
  * Get all users
@@ -62,17 +64,13 @@ router.post('/', async(req, res) => {
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
-    const user = User.findOne({email: req.body.email});
+    const user = await User.findOne({email: req.body.email});
     if (user) return res.status(400).send('Email already registered.');
 
     try {
-        const newUser = User({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
-        });
-        const result = await newUser.save();
-        res.send(result);
+        const newUser = User(_.pick(req.body, ['name', 'email', 'password']));
+        await newUser.save();
+        res.send(_.pick(newUser, ['_id', 'name', 'email']));
     }
 
     catch (ex) {

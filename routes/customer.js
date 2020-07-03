@@ -9,7 +9,8 @@ const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
-
+// Lodash
+const _ = require('lodash');
 /**
  * Get all customers
  * @return { Array } Array of Customer objects
@@ -63,11 +64,7 @@ router.post('/', async(req, res) => {
     if (error) return res.status(400).send(error);
 
     try {
-        const newCustomer = Customer({
-            name: req.body.name,
-            isGold: req.body.isGold,
-            phone: req.body.phone
-        });
+        const newCustomer = Customer(_.pick(req.body, ['name', 'isGold', 'phone']));
         const result = await newCustomer.save();
         res.send(result);
     }
