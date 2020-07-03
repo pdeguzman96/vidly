@@ -11,6 +11,8 @@ const errDebugger = require('debug')('app:err');
 const joi = require('../joi_schemas');
 // Lodash
 const _ = require('lodash');
+// For salt hashing passwords;
+const bcrypt = require('bcrypt');
 
 /**
  * Get all users
@@ -69,6 +71,10 @@ router.post('/', async(req, res) => {
 
     try {
         const newUser = User(_.pick(req.body, ['name', 'email', 'password']));
+        // Generating salt and created a hashed password
+        const salt = await bcrypt.genSalt(10);
+        newUser.password = await bcrypt.hash(newUser.password, salt);
+        
         await newUser.save();
         res.send(_.pick(newUser, ['_id', 'name', 'email']));
     }

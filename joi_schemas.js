@@ -51,6 +51,14 @@ const userCreateSchema = Joi.object({
     password: Joi.string().required().min(4).max(255)
 })
 
+function validateUser(req) {
+    const schema = Joi.object({
+        email: Joi.string().required().min(5).max(255).email(),
+        password: Joi.string().required().min(4).max(255)
+    });
+    return schema.validate(req);
+}
+
 module.exports.basicIdSchema = basicIdSchema
 module.exports.genreNameSchema = genreNameSchema
 module.exports.custCreateSchema = custCreateSchema
@@ -59,3 +67,4 @@ module.exports.movieCreateSchema = movieCreateSchema
 module.exports.movieUpdateSchema = movieUpdateSchema
 module.exports.rentalCreateSchema = rentalCreateSchema
 module.exports.userCreateSchema = userCreateSchema
+module.exports.validateUser = validateUser
