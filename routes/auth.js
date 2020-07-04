@@ -22,7 +22,7 @@ const config = require('config');
  * Authenticate a user via password
  * @param { String } req.body.email User's email
  * @param { String } req.body.password The user's password
- * @return { Boolean } true if authenticated, else false
+ * @return { String } JWT for the authenticated user
  */
 router.post('/', async(req, res) => {
     infoDebugger('Validating user');

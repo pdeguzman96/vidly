@@ -9,10 +9,13 @@ const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
-// Lodash
+// Lodash - utility
 const _ = require('lodash');
 // For salt hashing passwords;
 const bcrypt = require('bcrypt');
+// For generating JWTs for registered users
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 /**
  * Get all users
@@ -74,9 +77,14 @@ router.post('/', async(req, res) => {
         // Generating salt and created a hashed password
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(newUser.password, salt);
+        // Generating JWT for the newly registered user
+        const token = jwt.sign(
+            {_id: newUser._id}, // payload
+            config.get('jwtPrivateKey') // private key from env
+            )
         
         await newUser.save();
-        res.send(_.pick(newUser, ['_id', 'name', 'email']));
+        res.header('x-auth-token', token).send(_.pick(newUser, ['_id', 'name', 'email']));
     }
 
     catch (ex) {
