@@ -1,14 +1,20 @@
+// API
 const express = require('express');
+// Logging
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
+// API Routes
 const genre = require('./routes/genre');
 const customer = require('./routes/customer');
 const movie = require('./routes/movie');
 const rental = require('./routes/rental')
 const user = require('./routes/user');
 const auth = require('./routes/auth');
-const app = express();
+// Configurations
 const config = require('config');
+const error = require('./middleware/error');
+// Initializing app
+const app = express();
 
 if (!config.get('jwtPrivateKey')) {
     errDebugger('FATAL ERROR: jwtPrivateKey is not defined.');
@@ -22,6 +28,8 @@ app.use('/movies', movie);
 app.use('/rentals', rental);
 app.use('/users', user);
 app.use('/auth', auth);
+// Error middleware for handling errors after request/response failure
+app.use(error);
 
 // Listen on a port
 // Env var: PORT

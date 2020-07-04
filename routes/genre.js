@@ -13,23 +13,19 @@ const joi = require('../joi_schemas');
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
 const admin = require('../middleware/admin');
+// Middleware for encapsulating try/catch route handlers
+const asyncMiddleware = require('../middleware/async');
 
 /**
  * Fetch all genres
  * @return { Array } Array of Genre objects
  */
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware (async (req, res) => {
     infoDebugger('Getting all genres...')
-    try { 
-        const genres = await Genre.find().sort('name');  
-        return res.send(genres);
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return res.status(500).send(ex);
-    }
-    
-});
+    const genres = await Genre.find().sort('name');
+    return res.send(genres);
+    })
+);
 
 /**
  * Fetch one genre
