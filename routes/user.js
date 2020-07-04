@@ -13,12 +13,14 @@ const joi = require('../joi_schemas');
 const _ = require('lodash');
 // For salt hashing passwords;
 const bcrypt = require('bcrypt');
+// Middleware for validating JWT
+const auth = require('../middleware/auth');
 
 /**
  * Get all users
  * @return { Array } Array of User objects
  */
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     infoDebugger('Getting all users...');
     try {
         const users = await User.find().sort('email');
@@ -31,19 +33,15 @@ router.get('/', async (req, res) => {
 })
 
 /**
- * Get user by ID
- * @param { String } req.params.id ID of the requested user
+ * Get users using JWT
  * @return { Object } User object requested
  */
-router.get('/:id', async (req, res) =>{
+router.get('/me', auth, async (req, res) =>{
     infoDebugger('Getting single user');
-    const {error, value } = joi.basicIdSchema.validate(req.params);
-    if (error) return res.status(400).send(error);
-    infoDebugger(value);
 
     try {
-        const user = await User.findById(req.params.id);
-        if (!user) return res.status(404).send(`user with ID ${req.params.id} not found.`);
+        const user = await User.findById(req.user._id).select('-password');
+        if (!user) return res.status(404).send(`user with ID ${req.user._id} not found.`);
         res.send(user);
     }
 
