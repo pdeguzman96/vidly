@@ -11,6 +11,8 @@ const errDebugger = require('debug')('app:err');
 const joi = require('../joi_schemas');
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
+// Middleware for validating admin access
+const admin = require('../middleware/admin');
 
 /**
  * Fetch all genres
@@ -82,7 +84,7 @@ router.post('/', auth, async (req,res) => {
  * @param { String } name json body param | new name of the genre
  * @return { Object } Updated Genre Object
  */
-router.put('/:id', (req,res) => {
+router.put('/:id', auth, (req,res) => {
     // Joi Validation - ID
     let id_res = joi.basicIdSchema.validate(req.params);
     if (id_res.error) return res.status(400).send(id_res.error);
@@ -110,7 +112,7 @@ router.put('/:id', (req,res) => {
  * @param { String } id query string | MongoDB ID for the genre to delete
  * @return { Object } Deleted Genre object
  */
-router.delete('/:id', (req,res) => {
+router.delete('/:id', [auth, admin], (req,res) => {
     // Joi Validation - ID
     const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);

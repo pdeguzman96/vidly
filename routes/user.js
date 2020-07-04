@@ -17,22 +17,6 @@ const bcrypt = require('bcrypt');
 const auth = require('../middleware/auth');
 
 /**
- * Get all users
- * @return { Array } Array of User objects
- */
-router.get('/', auth, async (req, res) => {
-    infoDebugger('Getting all users...');
-    try {
-        const users = await User.find().sort('email');
-        return res.send(users);
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return res.status(500).send(ex);
-    }
-})
-
-/**
  * Get users using JWT
  * @return { Object } User object requested
  */

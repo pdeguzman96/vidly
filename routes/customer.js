@@ -13,6 +13,8 @@ const joi = require('../joi_schemas');
 const _ = require('lodash');
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
+// Middleware for validating admin access
+const admin = require('../middleware/admin');
 
 /**
  * Get all customers
@@ -121,7 +123,7 @@ router.put('/:id', auth, async (req, res) => {
  * @param { String } req.params.id ID of the customer to delete
  * @return { Object } Deleted customer object
  */
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     infoDebugger('Deleting existing customer');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);

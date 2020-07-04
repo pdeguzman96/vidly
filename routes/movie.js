@@ -12,6 +12,8 @@ const errDebugger = require('debug')('app:err');
 const joi = require('../joi_schemas');
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
+// Middleware for validating admin access
+const admin = require('../middleware/admin');
 
 /**
  * Fetch all movies 
@@ -147,7 +149,7 @@ router.put('/:id', auth, async (req, res) => {
  * @param { String } req.params.id ID of the movie to delete
  * @return { Object } Deleted Movie object
  */
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     infoDebugger('Deleting existing movie');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);

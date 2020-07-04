@@ -10,8 +10,8 @@ function auth(req, res, next) {
     if (!token) return res.status(401).send('Access Denied. No JWT provided.');
 
     try {
-        const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
-        req.user = decoded;
+        const decodedPayload = jwt.verify(token, config.get('jwtPrivateKey'));
+        req.user = decodedPayload;
         // Passing control to the next middleware function
         next();
     }

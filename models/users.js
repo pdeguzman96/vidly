@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
         minlength: 5,
         maxlength: 1024
     },
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
     createdAt: { 
         type: Date,
         default: Date.now()
@@ -35,7 +39,10 @@ const userSchema = new mongoose.Schema({
  */
 userSchema.methods.generateAuthToken = function () {
     return jwt.sign(
-        {_id: this._id}, // payload
+        {
+            _id: this._id,
+            isAdmin: this.isAdmin
+        }, // payload
         config.get('jwtPrivateKey') // private key from env
         );
 };
