@@ -15,20 +15,18 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
-// Middleware for encapsulating try/catch route handlers
-const asyncMiddleware = require('../middleware/async');
 
 /**
  * Get users using JWT
  * @return { Object } User object requested
  */
-router.get('/me', auth, asyncMiddleware(async (req, res) =>{
+router.get('/me', auth, async (req, res) =>{
     infoDebugger('Getting single user');
     const user = await User.findById(req.user._id).select('-password');
     if (!user) return res.status(404).send(`user with ID ${req.user._id} not found.`);
     res.send(user);
-    })
-)
+    }
+);
 
 /**
  * Create a new user if user's email isn't already registered
@@ -37,7 +35,7 @@ router.get('/me', auth, asyncMiddleware(async (req, res) =>{
  * @param { String } req.body.password The user's password
  * @return { Object } User object created
  */
-router.post('/', asyncMiddleware(async(req, res) => {
+router.post('/', async(req, res) => {
     infoDebugger('Creating new user');
     const { error, value } = joi.userCreateSchema.validate(req.body);
     infoDebugger(value);
@@ -55,7 +53,7 @@ router.post('/', asyncMiddleware(async(req, res) => {
     
     await newUser.save();
     res.header('x-auth-token', token).send(_.pick(newUser, ['_id', 'name', 'email']));
-    })
+    }
 );
 
 module.exports = router;

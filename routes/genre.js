@@ -13,18 +13,16 @@ const joi = require('../joi_schemas');
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
 const admin = require('../middleware/admin');
-// Middleware for encapsulating try/catch route handlers
-const asyncMiddleware = require('../middleware/async');
 
 /**
  * Fetch all genres
  * @return { Array } Array of Genre objects
  */
-router.get('/', asyncMiddleware (async (req, res) => {
+router.get('/', async (req, res) => {
     infoDebugger('Getting all genres...')
     const genres = await Genre.find().sort('name');
     return res.send(genres);
-    })
+    }
 );
 
 /**
@@ -32,7 +30,7 @@ router.get('/', asyncMiddleware (async (req, res) => {
  * @param { String } id query string | MongoDB ID for the requested genre
  * @return { Object } Genre Object
  */
-router.get('/:id', asyncMiddleware (async (req,res) => {
+router.get('/:id', async (req,res) => {
     // Joi Validation
     const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
@@ -41,7 +39,7 @@ router.get('/:id', asyncMiddleware (async (req,res) => {
     const genre = await Genre.findById(req.params.id);
     if (!genre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
     res.send(genre);
-    })
+    }
 );
 
 /**
@@ -49,7 +47,7 @@ router.get('/:id', asyncMiddleware (async (req,res) => {
  * @param { String } req.body.name json body param | The name of the genre to POST 
  * @return { Object } New Genre Object
  */
-router.post('/', auth, asyncMiddleware (async (req,res) => {
+router.post('/', auth, async (req,res) => {
     // Joi Validation
     const { error, value } = joi.genreNameSchema.validate(req.body);
     infoDebugger(value);
@@ -61,7 +59,7 @@ router.post('/', auth, asyncMiddleware (async (req,res) => {
     const result = await newGenre.save();
     infoDebugger('New Genre Created...\n',result);
     res.send(result)
-    })
+    }
 );
 
 /**
@@ -70,7 +68,7 @@ router.post('/', auth, asyncMiddleware (async (req,res) => {
  * @param { String } name json body param | new name of the genre
  * @return { Object } Updated Genre Object
  */
-router.put('/:id', auth, asyncMiddleware(async (req,res) => {
+router.put('/:id', auth, async (req,res) => {
     // Joi Validation - ID
     let id_res = joi.basicIdSchema.validate(req.params);
     if (id_res.error) return res.status(400).send(id_res.error);
@@ -89,7 +87,7 @@ router.put('/:id', auth, asyncMiddleware(async (req,res) => {
     const updatedGenre = await Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})
     if (!updatedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
     res.send(updatedGenre);
-    })
+    }
 );
 
 /**
@@ -97,7 +95,7 @@ router.put('/:id', auth, asyncMiddleware(async (req,res) => {
  * @param { String } id query string | MongoDB ID for the genre to delete
  * @return { Object } Deleted Genre object
  */
-router.delete('/:id', [auth, admin], asyncMiddleware(async (req,res) => {
+router.delete('/:id', [auth, admin], async (req,res) => {
     // Joi Validation - ID
     const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
@@ -106,7 +104,7 @@ router.delete('/:id', [auth, admin], asyncMiddleware(async (req,res) => {
     const deletedGenre = await Genre.findByIdAndRemove({ _id: req.params.id })
     if (!deletedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
     res.send(deletedGenre);
-    })
+    }
 );
 
 module.exports = router;

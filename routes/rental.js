@@ -17,19 +17,17 @@ const Fawn = require('fawn');
 Fawn.init(mongoose);
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
-// Middleware for encapsulating try/catch route handlers
-const asyncMiddleware = require('../middleware/async');
 
 /**
  * Get all rentals
  * @return { Array } Array of Rental objects
  */
-router.get('/', asyncMiddleware(async (req, res) => {
+router.get('/', async (req, res) => {
     infoDebugger('Getting all rentals...');
     const rentals = await Rental.find().sort('-dateOut');
     return res.send(rentals);
-    })
-)
+    }
+);
 
 /**
  * Create a new rental. Make sure customer and movie exist, and automatically decrement the movie
@@ -37,7 +35,7 @@ router.get('/', asyncMiddleware(async (req, res) => {
  * @param { Object } req.body.movieId ID of the movie
  * @return { Object } Containing both the new rental and the decremented movie
  */
-router.post('/', auth, asyncMiddleware(async (req, res) => {
+router.post('/', auth, async (req, res) => {
     infoDebugger('Creating new rental...');
     // Joi input validation
     const { error, value } = joi.rentalCreateSchema.validate(req.body);
@@ -84,7 +82,7 @@ router.post('/', auth, asyncMiddleware(async (req, res) => {
 
     infoDebugger('New Rental Created...\n',newRental);
     return res.send(newRental)
-    })
-)
+    }
+);
 
 module.exports = router;

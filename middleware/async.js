@@ -1,3 +1,5 @@
+// NOTE: This middleware is no longer in use. express-async-errors is used to manage error handling
+
 /**
  * Middleware function to manage try/catch logic for routes. 
  * This helps us focus on only the route handler logic within route code blocks.

@@ -14,19 +14,17 @@ const joi = require('../joi_schemas');
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
 const admin = require('../middleware/admin');
-// Middleware for encapsulating try/catch route handlers
-const asyncMiddleware = require('../middleware/async');
 
 /**
  * Fetch all movies 
  * @return { Array } Array of Movie objects
  */
-router.get('/', asyncMiddleware(async (req, res) => {
+router.get('/', async (req, res) => {
     infoDebugger('Getting all movies...')
 
     const movies = await Movie.find().sort('name');  
     return res.send(movies);
-    })
+    }
 );
 
 /**
@@ -34,7 +32,7 @@ router.get('/', asyncMiddleware(async (req, res) => {
  * @param { String } req.params.id ID of the requested movie
  * @return { Object } Movie object requested
  */
-router.get('/:id', asyncMiddleware(async (req, res) =>{
+router.get('/:id', async (req, res) =>{
     infoDebugger('Getting single movie');
     const {error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
@@ -43,8 +41,8 @@ router.get('/:id', asyncMiddleware(async (req, res) =>{
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send(`Movie with ID ${req.params.id} not found.`);
     res.send(movie);
-    })
-)
+    }
+);
 
 /**
  * POST a new movie in the database
@@ -54,7 +52,7 @@ router.get('/:id', asyncMiddleware(async (req, res) =>{
  * @param { Number } req.body.dailyRentalRate The daily rental rate of the movie
  * @return { Object } New Movie Object
  */
-router.post('/', auth, asyncMiddleware(async (req,res) => {
+router.post('/', auth, async (req,res) => {
     // Joi Validation
     const { error, value } = joi.movieCreateSchema.validate(req.body);
     infoDebugger(value);
@@ -78,7 +76,7 @@ router.post('/', auth, asyncMiddleware(async (req,res) => {
     const result = await newMovie.save();
     infoDebugger('New Movie Created...\n',result);
     res.send(result)
-    })
+    }
 );
 
 /**
@@ -90,7 +88,7 @@ router.post('/', auth, asyncMiddleware(async (req,res) => {
  * @param { Number } req.body.dailyRentalRate New rental rate for the movie
  * @return { Object } New Movie object
  */
-router.put('/:id', auth, asyncMiddleware(async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     infoDebugger('Updating existing movie');
     // Validating the body
     const bodyValidation = joi.movieUpdateSchema.validate(req.body);
@@ -122,7 +120,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
     movie.updatedAt = Date.now();
     const updatedMovie = await movie.save();
     res.send(updatedMovie);
-    })
+    }
 );
 
 /**
@@ -130,7 +128,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
  * @param { String } req.params.id ID of the movie to delete
  * @return { Object } Deleted Movie object
  */
-router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     infoDebugger('Deleting existing movie');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
@@ -139,8 +137,8 @@ router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
     const deletedMovie = await Movie.findByIdAndRemove(req.params.id);
     if (!deletedMovie) return res.status(404).send(`Movie with ID ${req.params.id} not found.`);
     return res.send(deletedMovie);
-    })
-)
+    }
+);
 
 
 module.exports = router;

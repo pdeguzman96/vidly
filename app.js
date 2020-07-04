@@ -1,5 +1,7 @@
 // API
 const express = require('express');
+// Easy Async Error handling
+require('express-async-errors');
 // Logging
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
@@ -13,6 +15,7 @@ const auth = require('./routes/auth');
 // Configurations
 const config = require('config');
 const error = require('./middleware/error');
+
 // Initializing app
 const app = express();
 

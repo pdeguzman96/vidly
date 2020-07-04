@@ -15,26 +15,24 @@ const _ = require('lodash');
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
 const admin = require('../middleware/admin');
-// Middleware for encapsulating try/catch route handlers
-const asyncMiddleware = require('../middleware/async');
 
 /**
  * Get all customers
  * @return { Array } Array of Customer objects
  */
-router.get('/', asyncMiddleware (async (req, res) => {
+router.get('/', async (req, res) => {
     infoDebugger('Getting all customers...');
     const customers = await Customer.find().sort('name');
     return res.send(customers);
-    })
-)
+    }
+);
 
 /**
  * Get customer by ID
  * @param { String } req.params.id ID of the requested customer
  * @return { Object } Customer object requested
  */
-router.get('/:id', asyncMiddleware (async (req, res) =>{
+router.get('/:id', async (req, res) =>{
     infoDebugger('Getting single customer');
     const {error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
@@ -43,8 +41,8 @@ router.get('/:id', asyncMiddleware (async (req, res) =>{
     const customer = await Customer.findById(req.params.id);
     if (!customer) return res.status(404).send(`Customer with ID ${req.params.id} not found.`);
     res.send(customer);
-    })
-)
+    }
+);
 
 /**
  * Create a new customer
@@ -53,7 +51,7 @@ router.get('/:id', asyncMiddleware (async (req, res) =>{
  * @param { String } req.body.phone The customer's phone number
  * @return { Object } Customer object created
  */
-router.post('/', auth, asyncMiddleware(async(req, res) => {
+router.post('/', auth, async(req, res) => {
     infoDebugger('Creating new customer');
     const { error, value } = joi.custCreateSchema.validate(req.body);
     infoDebugger(value);
@@ -62,7 +60,7 @@ router.post('/', auth, asyncMiddleware(async(req, res) => {
     const newCustomer = Customer(_.pick(req.body, ['name', 'isGold', 'phone']));
     const result = await newCustomer.save();
     res.send(result);
-    })
+    }
 );
 
 /**
@@ -73,7 +71,7 @@ router.post('/', auth, asyncMiddleware(async(req, res) => {
  * @param { String } req.body.phone New phone number of the customer
  * @return { Object } New Customer object
  */
-router.put('/:id', auth, asyncMiddleware(async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     infoDebugger('Updating existing customer');
     // Validating the body
     const bodyValidation = joi.custUpdateSchema.validate(req.body);
@@ -93,7 +91,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
     customer.updatedAt = Date.now();
     const updatedCustomer = await customer.save();
     res.send(updatedCustomer);
-    })
+    }
 );
 
 /**
@@ -101,7 +99,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
  * @param { String } req.params.id ID of the customer to delete
  * @return { Object } Deleted customer object
  */
-router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     infoDebugger('Deleting existing customer');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
@@ -110,7 +108,7 @@ router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
     const deletedCustomer = await Customer.findByIdAndRemove(req.params.id);
     if (!deletedCustomer) return res.status(404).send(`Customer with ID ${req.params.id} not found.`);
     return res.send(deletedCustomer);
-    })
-)
+    }
+);
 
 module.exports = router;
