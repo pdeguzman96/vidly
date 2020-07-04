@@ -17,22 +17,19 @@ const Fawn = require('fawn');
 Fawn.init(mongoose);
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
+// Middleware for encapsulating try/catch route handlers
+const asyncMiddleware = require('../middleware/async');
 
 /**
  * Get all rentals
  * @return { Array } Array of Rental objects
  */
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware(async (req, res) => {
     infoDebugger('Getting all rentals...');
-    try {
-        const rentals = await Rental.find().sort('-dateOut');
-        return res.send(rentals);
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return res.status(500).send(ex);
-    }
-})
+    const rentals = await Rental.find().sort('-dateOut');
+    return res.send(rentals);
+    })
+)
 
 /**
  * Create a new rental. Make sure customer and movie exist, and automatically decrement the movie
@@ -40,7 +37,7 @@ router.get('/', async (req, res) => {
  * @param { Object } req.body.movieId ID of the movie
  * @return { Object } Containing both the new rental and the decremented movie
  */
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, asyncMiddleware(async (req, res) => {
     infoDebugger('Creating new rental...');
     // Joi input validation
     const { error, value } = joi.rentalCreateSchema.validate(req.body);
@@ -55,43 +52,39 @@ router.post('/', auth, async (req, res) => {
     // Checking if customer exists
     const selectedCustomer = await Customer.findById(req.body.customerId);
     if (!selectedCustomer) return res.status(404).send(`Customer with ID ${req.body.customerId} does not exist.`);
-
+    
+    // Creating Rental object
+    const newRental = new Rental({
+        movie: {
+            _id: selectedMovie._id,
+            title: selectedMovie.title,
+            dailyRentalRate: selectedMovie.dailyRentalRate
+        },
+        customer: {
+            _id: selectedCustomer._id,
+            name: selectedCustomer.name,
+            phone: selectedCustomer.phone,
+            isGold: selectedCustomer.isGold
+        }
+    });
+    // Two-Phase commit with Fawn
     try {
-        const newRental = new Rental({
-            movie: {
-                _id: selectedMovie._id,
-                title: selectedMovie.title,
-                dailyRentalRate: selectedMovie.dailyRentalRate
-            },
-            customer: {
-                _id: selectedCustomer._id,
-                name: selectedCustomer.name,
-                phone: selectedCustomer.phone,
-                isGold: selectedCustomer.isGold
-            }
-        });
-
-        try {
-            new Fawn.Task()
-                .save('rentals', newRental)
-                .update('movies', 
-                    {_id: selectedMovie._id}, 
-                    {$inc: { numberInStock: -1 }})
-                .run();
-            res.send(newRental);
-        }
-        catch (ex) {
-            errDebugger(ex);
-            return res.status(500).send(ex);
-        }
-
-        infoDebugger('New Rental Created...\n',newRental);
-        return 
+        new Fawn.Task()
+            .save('rentals', newRental)
+            .update('movies', 
+                {_id: selectedMovie._id}, 
+                {$inc: { numberInStock: -1 }})
+            .run();
+        res.send(newRental);
     }
     catch (ex) {
         errDebugger(ex);
         return res.status(500).send(ex);
     }
-})
+
+    infoDebugger('New Rental Created...\n',newRental);
+    return res.send(newRental)
+    })
+)
 
 module.exports = router;
