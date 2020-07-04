@@ -14,45 +14,37 @@ const joi = require('../joi_schemas');
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
 const admin = require('../middleware/admin');
+// Middleware for encapsulating try/catch route handlers
+const asyncMiddleware = require('../middleware/async');
 
 /**
  * Fetch all movies 
  * @return { Array } Array of Movie objects
  */
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware(async (req, res) => {
     infoDebugger('Getting all movies...')
-    try { 
-        const movies = await Movie.find().sort('name');  
-        return res.send(movies);
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return res.status(500).send(ex);
-    }
-});
+
+    const movies = await Movie.find().sort('name');  
+    return res.send(movies);
+    })
+);
 
 /**
  * Get movie by ID
  * @param { String } req.params.id ID of the requested movie
  * @return { Object } Movie object requested
  */
-router.get('/:id', async (req, res) =>{
+router.get('/:id', asyncMiddleware(async (req, res) =>{
     infoDebugger('Getting single movie');
     const {error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
     infoDebugger(value);
-
-    try {
-        const movie = await Movie.findById(req.params.id);
-        if (!movie) return res.status(404).send(`Movie with ID ${req.params.id} not found.`);
-        res.send(movie);
-    }
-
-    catch (ex) {
-        errDebugger(ex);
-        res.status(500).send(ex);
-    }
-})
+    // Fetching movie
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) return res.status(404).send(`Movie with ID ${req.params.id} not found.`);
+    res.send(movie);
+    })
+)
 
 /**
  * POST a new movie in the database
@@ -62,7 +54,7 @@ router.get('/:id', async (req, res) =>{
  * @param { Number } req.body.dailyRentalRate The daily rental rate of the movie
  * @return { Object } New Movie Object
  */
-router.post('/', auth, async (req,res) => {
+router.post('/', auth, asyncMiddleware(async (req,res) => {
     // Joi Validation
     const { error, value } = joi.movieCreateSchema.validate(req.body);
     infoDebugger(value);
@@ -72,26 +64,22 @@ router.post('/', auth, async (req,res) => {
     const genreSelected = await Genre.findById(req.body.genreId);
     if (!genreSelected) return res.status(404).send(`Genre with ID ${req.body.genreId}`)
 
-    try {
-        const newMovie = new Movie({
-            title: req.body.title,
-            genre: {
-                _id: genreSelected._id,
-                name: genreSelected.name
-            },
-            numberInStock: req.body.numberInStock,
-            dailyRentalRate: req.body.dailyRentalRate
-        });
-
-        const result = await newMovie.save();
-        infoDebugger('New Movie Created...\n',result);
-        res.send(result)
-    }
-    catch (ex) {
-        errDebugger(ex);
-        res.status(500).send(ex)
-    }
-});
+    // Creating new Movie object
+    const newMovie = new Movie({
+        title: req.body.title,
+        genre: {
+            _id: genreSelected._id,
+            name: genreSelected.name
+        },
+        numberInStock: req.body.numberInStock,
+        dailyRentalRate: req.body.dailyRentalRate
+    });
+    // Saving to DB
+    const result = await newMovie.save();
+    infoDebugger('New Movie Created...\n',result);
+    res.send(result)
+    })
+);
 
 /**
  * Update an existing movie
@@ -102,7 +90,7 @@ router.post('/', auth, async (req,res) => {
  * @param { Number } req.body.dailyRentalRate New rental rate for the movie
  * @return { Object } New Movie object
  */
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, asyncMiddleware(async (req, res) => {
     infoDebugger('Updating existing movie');
     // Validating the body
     const bodyValidation = joi.movieUpdateSchema.validate(req.body);
@@ -121,51 +109,38 @@ router.put('/:id', auth, async (req, res) => {
         if (!genreSelected) return res.status(404).send(`Genre with ID ${req.body.genreId} does not exist.`)
     }
 
-    try {
-        // Fetching movie
-        const movie = await Movie.findById(req.params.id);
-        if (!movie) return res.status(404).send(`Movie with ID ${req.params.id} does not exist.`)
-        // Updating values
-        movie.title = req.body.title || movie.title;
-        if (genreProvided) {
-            movie.genre = {_id: genreSelected._id, name: genreSelected.name}
-        };
-        movie.numberInStock = req.body.numberInStock || movie.numberInStock;
-        movie.dailyRentalRate = req.body.dailyRentalRate || movie.dailyRentalRate
-        movie.updatedAt = Date.now();
-        const updatedMovie = await movie.save();
-        res.send(updatedMovie);
-    }
-
-    catch (ex) {
-        errDebugger(ex);
-        res.status(400).send(ex);
-    }
-
-});
+    // Fetching movie
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) return res.status(404).send(`Movie with ID ${req.params.id} does not exist.`)
+    // Updating values
+    movie.title = req.body.title || movie.title;
+    if (genreProvided) {
+        movie.genre = {_id: genreSelected._id, name: genreSelected.name}
+    };
+    movie.numberInStock = req.body.numberInStock || movie.numberInStock;
+    movie.dailyRentalRate = req.body.dailyRentalRate || movie.dailyRentalRate
+    movie.updatedAt = Date.now();
+    const updatedMovie = await movie.save();
+    res.send(updatedMovie);
+    })
+);
 
 /**
  * Delete an existing movie
  * @param { String } req.params.id ID of the movie to delete
  * @return { Object } Deleted Movie object
  */
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
     infoDebugger('Deleting existing movie');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);
     infoDebugger(value);
-
-    try {
-        const deletedMovie = await Movie.findByIdAndRemove(req.params.id);
-        if (!deletedMovie) return res.status(404).send(`Movie with ID ${req.params.id} not found.`);
-        return res.send(deletedMovie);
-    }
-
-    catch (ex) {
-        errDebugger(ex);
-        res.status(500).send(ex);
-    }
-})
+    // Fetching and deleting movie
+    const deletedMovie = await Movie.findByIdAndRemove(req.params.id);
+    if (!deletedMovie) return res.status(404).send(`Movie with ID ${req.params.id} not found.`);
+    return res.send(deletedMovie);
+    })
+)
 
 
 module.exports = router;
