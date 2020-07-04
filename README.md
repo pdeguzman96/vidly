@@ -14,6 +14,7 @@ To properly use this app, please set the following environment variables...
 ## Repo Contents
 - /config/: configurations files used to reference the proper database (MongoDB standalone server)
 - /db/: js file that initializes the MongoDB database
+- /middleware/: custom middleware used to augment request processing pipeline
 - /models/: js files that define the schema and model of the MongoDB documents
 - /node_modules/: npm modules
 - /routes/: API routes build with `express`

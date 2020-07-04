@@ -11,6 +11,9 @@ const errDebugger = require('debug')('app:err');
 const joi = require('../joi_schemas');
 // Lodash
 const _ = require('lodash');
+// Middleware for validating JWT
+const auth = require('../middleware/auth');
+
 /**
  * Get all customers
  * @return { Array } Array of Customer objects
@@ -57,7 +60,7 @@ router.get('/:id', async (req, res) =>{
  * @param { String } req.body.phone The customer's phone number
  * @return { Object } Customer object created
  */
-router.post('/', async(req, res) => {
+router.post('/', auth, async(req, res) => {
     infoDebugger('Creating new customer');
     const { error, value } = joi.custCreateSchema.validate(req.body);
     infoDebugger(value);
@@ -83,7 +86,7 @@ router.post('/', async(req, res) => {
  * @param { String } req.body.phone New phone number of the customer
  * @return { Object } New Customer object
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     infoDebugger('Updating existing customer');
     // Validating the body
     const bodyValidation = joi.custUpdateSchema.validate(req.body);
@@ -118,7 +121,7 @@ router.put('/:id', async (req, res) => {
  * @param { String } req.params.id ID of the customer to delete
  * @return { Object } Deleted customer object
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     infoDebugger('Deleting existing customer');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);

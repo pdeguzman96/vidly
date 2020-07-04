@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     updatedAt: Date
 })
 
+/**
+ * Generate a JWT token for an authenticated user.
+ * @return { String } Json web token
+ */
 userSchema.methods.generateAuthToken = function () {
     return jwt.sign(
         {_id: this._id}, // payload

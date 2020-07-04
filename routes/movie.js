@@ -10,6 +10,8 @@ const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
+// Middleware for validating JWT
+const auth = require('../middleware/auth');
 
 /**
  * Fetch all movies 
@@ -58,7 +60,7 @@ router.get('/:id', async (req, res) =>{
  * @param { Number } req.body.dailyRentalRate The daily rental rate of the movie
  * @return { Object } New Movie Object
  */
-router.post('/', async (req,res) => {
+router.post('/', auth, async (req,res) => {
     // Joi Validation
     const { error, value } = joi.movieCreateSchema.validate(req.body);
     infoDebugger(value);
@@ -98,7 +100,7 @@ router.post('/', async (req,res) => {
  * @param { Number } req.body.dailyRentalRate New rental rate for the movie
  * @return { Object } New Movie object
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     infoDebugger('Updating existing movie');
     // Validating the body
     const bodyValidation = joi.movieUpdateSchema.validate(req.body);
@@ -145,7 +147,7 @@ router.put('/:id', async (req, res) => {
  * @param { String } req.params.id ID of the movie to delete
  * @return { Object } Deleted Movie object
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     infoDebugger('Deleting existing movie');
     const { error, value } = joi.basicIdSchema.validate(req.params);
     if (error) return res.status(400).send(error);

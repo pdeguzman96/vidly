@@ -15,6 +15,8 @@ const joi = require('../joi_schemas');
 // Two-Phase Commits
 const Fawn = require('fawn');
 Fawn.init(mongoose);
+// Middleware for validating JWT
+const auth = require('../middleware/auth');
 
 /**
  * Get all rentals
@@ -38,7 +40,7 @@ router.get('/', async (req, res) => {
  * @param { Object } req.body.movieId ID of the movie
  * @return { Object } Containing both the new rental and the decremented movie
  */
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     infoDebugger('Creating new rental...');
     // Joi input validation
     const { error, value } = joi.rentalCreateSchema.validate(req.body);

@@ -9,6 +9,8 @@ const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
+// Middleware for validating JWT
+const auth = require('../middleware/auth');
 
 /**
  * Fetch all genres
@@ -54,7 +56,7 @@ router.get('/:id', async (req,res) => {
  * @param { String } req.body.name json body param | The name of the genre to POST 
  * @return { Object } New Genre Object
  */
-router.post('/', async (req,res) => {
+router.post('/', auth, async (req,res) => {
     // Joi Validation
     const { error, value } = joi.genreNameSchema.validate(req.body);
     infoDebugger(value);
