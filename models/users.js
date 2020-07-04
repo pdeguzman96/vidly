@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+// For generating JWTs for registered users
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -25,6 +28,13 @@ const userSchema = new mongoose.Schema({
     },
     updatedAt: Date
 })
+
+userSchema.methods.generateAuthToken = function () {
+    return jwt.sign(
+        {_id: this._id}, // payload
+        config.get('jwtPrivateKey') // private key from env
+        );
+};
 
 const User = new mongoose.model("User", userSchema);
 

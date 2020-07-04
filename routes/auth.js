@@ -13,10 +13,6 @@ const joi = require('../joi_schemas');
 const _ = require('lodash');
 // For salt hashing passwords;
 const bcrypt = require('bcrypt');
-// Creating JWTs for authenticated users
-const jwt = require('jsonwebtoken');
-// For getting JWT private key from env
-const config = require('config');
 
 /**
  * Authenticate a user via password
@@ -37,10 +33,7 @@ router.post('/', async(req, res) => {
     if (!validPassword) return res.status(400).send('Invalid email or password.');
     
     infoDebugger('Authenticated.');
-    const token = jwt.sign(
-        {_id: user._id}, // payload
-        config.get('jwtPrivateKey') // private key from env
-        )
+    const token = user.generateAuthToken();
     res.send(token);
 });
 

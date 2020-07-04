@@ -13,9 +13,6 @@ const joi = require('../joi_schemas');
 const _ = require('lodash');
 // For salt hashing passwords;
 const bcrypt = require('bcrypt');
-// For generating JWTs for registered users
-const jwt = require('jsonwebtoken');
-const config = require('config');
 
 /**
  * Get all users
@@ -78,10 +75,7 @@ router.post('/', async(req, res) => {
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(newUser.password, salt);
         // Generating JWT for the newly registered user
-        const token = jwt.sign(
-            {_id: newUser._id}, // payload
-            config.get('jwtPrivateKey') // private key from env
-            )
+        const token = newUser.generateAuthToken();
         
         await newUser.save();
         res.header('x-auth-token', token).send(_.pick(newUser, ['_id', 'name', 'email']));
