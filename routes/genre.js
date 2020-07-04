@@ -32,47 +32,37 @@ router.get('/', asyncMiddleware (async (req, res) => {
  * @param { String } id query string | MongoDB ID for the requested genre
  * @return { Object } Genre Object
  */
-router.get('/:id', async (req,res) => {
+router.get('/:id', asyncMiddleware (async (req,res) => {
     // Joi Validation
     const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
-
-    try {
-        const genre = await Genre.findById(req.params.id);
-        if (!genre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
-        res.send(genre);
-    }
-    catch (ex) {
-        errDebugger(ex);
-        return res.status(500).send('Error occurred while fetching genre.');
-    }
-});
+    // Fetching genre
+    const genre = await Genre.findById(req.params.id);
+    if (!genre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
+    res.send(genre);
+    })
+);
 
 /**
  * POST a new genre in the database
  * @param { String } req.body.name json body param | The name of the genre to POST 
  * @return { Object } New Genre Object
  */
-router.post('/', auth, async (req,res) => {
+router.post('/', auth, asyncMiddleware (async (req,res) => {
     // Joi Validation
     const { error, value } = joi.genreNameSchema.validate(req.body);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
-
-    try {
-        const newGenre = new Genre({
-            name: req.body.name
-        });
-        const result = await newGenre.save();
-        infoDebugger('New Genre Created...\n',result);
-        res.send(result)
-    }
-    catch (ex) {
-        errDebugger(ex);
-        res.status(500).send(ex)
-    }
-});
+    // Create new genre
+    const newGenre = new Genre({
+        name: req.body.name
+    });
+    const result = await newGenre.save();
+    infoDebugger('New Genre Created...\n',result);
+    res.send(result)
+    })
+);
 
 /**
  * Update an existing genre
@@ -80,14 +70,14 @@ router.post('/', auth, async (req,res) => {
  * @param { String } name json body param | new name of the genre
  * @return { Object } Updated Genre Object
  */
-router.put('/:id', auth, (req,res) => {
+router.put('/:id', auth, asyncMiddleware(async (req,res) => {
     // Joi Validation - ID
     let id_res = joi.basicIdSchema.validate(req.params);
     if (id_res.error) return res.status(400).send(id_res.error);
     // Joi Validation - Name
     let name_res = joi.genreNameSchema.validate(req.body);
     if (name_res.error) return res.status(400).send(name_res.error);
-    
+    // Createing update object and target
     const updateTarget = {_id : req.params.id}
     const updateObj = {
         $set: {
@@ -95,31 +85,28 @@ router.put('/:id', auth, (req,res) => {
             updatedAt: Date.now()
         }
     }
-    Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})
-        .then( updatedGenre => {
-            if (!updatedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
-            res.send(updatedGenre);
-        } )
-        .catch( err => errDebugger(err));
-});
+    // Updating
+    const updatedGenre = await Genre.findOneAndUpdate(updateTarget, updateObj, {new: true})
+    if (!updatedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
+    res.send(updatedGenre);
+    })
+);
 
 /**
  * Remove Genre by ID
  * @param { String } id query string | MongoDB ID for the genre to delete
  * @return { Object } Deleted Genre object
  */
-router.delete('/:id', [auth, admin], (req,res) => {
+router.delete('/:id', [auth, admin], asyncMiddleware(async (req,res) => {
     // Joi Validation - ID
     const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
     if (error) return res.status(400).send(error);
 
-    Genre.findByIdAndRemove({ _id: req.params.id })
-        .then( deletedGenre => {
-            if (!deletedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
-            res.send(deletedGenre);
-        })
-        .catch( err => errDebugger(err));
-});
+    const deletedGenre = await Genre.findByIdAndRemove({ _id: req.params.id })
+    if (!deletedGenre) return res.status(404).send(`Genre with ID ${req.params.id} not found.`);
+    res.send(deletedGenre);
+    })
+);
 
 module.exports = router;
