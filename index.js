@@ -3,20 +3,18 @@ const express = require('express');
 // Logging
 const infoDebugger = require('debug')('app:info');
 
-// For logging exceptions and checking the JWT
-require('./startup/log');
-require('./startup/config');
 
 // Initializing app
 const app = express();
 // Log app environment (development, stage, or production)
 infoDebugger(`APP ENV: ${app.get('env')}`);
 
-// Connect to DB
-require('./db/db');
-
-// Loading routes
+// Startup functionality for logging, configs, db connection, and routes
+require('./startup/log');
+require('./startup/config');
+require('./startup/db');
 require('./startup/routes')(app);
+
 
 // Listen on a port
 const port = process.env.PORT || 5123

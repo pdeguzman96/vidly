@@ -5,7 +5,6 @@ const router = express.Router();
 const { Genre } = require('../models/genres');
 // Logging
 const infoDebugger = require('debug')('app:info');
-const errDebugger = require('debug')('app:err');
 // Input Validation
 const joi = require('../joi_schemas');
 // Middleware for validating JWT
