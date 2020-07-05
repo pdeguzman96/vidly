@@ -6,7 +6,6 @@ const { Rental } = require('../models/rentals');
 const { Movie } = require('../models/movies');
 const { Customer } = require('../models/customers');
 const mongoose = require('mongoose');
-const db = require('../db/db');
 // Logging
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');

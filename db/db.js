@@ -11,7 +11,6 @@ const mongoConfig ={
 }
 mongoose.connect(config.get('nosql_uri'), mongoConfig)
     .then(() => configDebugger(`Connected to ${config.get('nosql_uri')}`))
-    .catch(err => errDebugger(err))
 
 mongoose.set('useFindAndModify', false);
 

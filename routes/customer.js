@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 // DB Model
 const { Customer } = require('../models/customers');
-const db = require('../db/db');
 // Logging
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');

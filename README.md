@@ -18,6 +18,7 @@ To properly use this app, please set the following environment variables...
 - /models/: js files that define the schema and model of the MongoDB documents
 - /node_modules/: npm modules
 - /routes/: API routes build with `express`
+- /startup/: app startup file for initializing the app
 - app.js: main app that initializes the web server
 - joi_schemas.js: input validation schemas for the APIs
 

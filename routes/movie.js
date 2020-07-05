@@ -4,7 +4,6 @@ const router = express.Router();
 // DB
 const { Movie } = require('../models/movies');
 const { Genre } = require('../models/genres');
-const db = require('../db/db');
 // Logging
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
