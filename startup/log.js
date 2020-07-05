@@ -1,6 +1,5 @@
 const errDebugger = require('debug')('app:err');
-// Configurations
-const config = require('config');
+
 // Easy Async Error handling
 require('express-async-errors');
 
@@ -12,9 +11,3 @@ process.on('uncaughtException', ex => {
 });
 process.on('uncaughtRejection', ex => { throw ex });
 
-
-// Ensure JWT env var is set
-if (!config.get('jwtPrivateKey')) {
-    errDebugger('FATAL ERROR: jwtPrivateKey is not defined.');
-    process.exit(1);
-}

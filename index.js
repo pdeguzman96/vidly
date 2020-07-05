@@ -5,6 +5,7 @@ const infoDebugger = require('debug')('app:info');
 
 // For logging exceptions and checking the JWT
 require('./startup/log');
+require('./startup/config');
 
 // Initializing app
 const app = express();
