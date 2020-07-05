@@ -7,7 +7,7 @@ const { Customer } = require('../models/customers');
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
-const joi = require('../joi_schemas');
+const joi = require('../validations/joi_schemas');
 // Lodash
 const _ = require('lodash');
 // Middleware for validating JWT

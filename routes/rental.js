@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
-const joi = require('../joi_schemas');
+const joi = require('../validations/joi_schemas');
 // Two-Phase Commits
 const Fawn = require('fawn');
 Fawn.init(mongoose);

@@ -7,7 +7,7 @@ const { User } = require('../models/users');
 const infoDebugger = require('debug')('app:info');
 const errDebugger = require('debug')('app:err');
 // Input Validation
-const joi = require('../joi_schemas');
+const joi = require('../validations/joi_schemas');
 // Lodash - utility
 const _ = require('lodash');
 // For salt hashing passwords;

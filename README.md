@@ -18,8 +18,8 @@ To properly use this app, please set the following environment variables...
 - /node_modules/: npm modules
 - /routes/: API routes build with `express`
 - /startup/: startup files for logging, config, db, etc...
+- /validations/: joi input validation schemas for the APIs
 - index.js: main app that initializes the web server
-- joi_schemas.js: input validation schemas for the APIs
 
 ## Running the App
 In the root directory of the repo, run `node index.js` or `nodemon index.js` or `nodemon`.

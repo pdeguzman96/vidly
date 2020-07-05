@@ -6,7 +6,7 @@ const { Genre } = require('../models/genres');
 // Logging
 const infoDebugger = require('debug')('app:info');
 // Input Validation
-const joi = require('../joi_schemas');
+const joi = require('../validations/joi_schemas');
 // Middleware for validating JWT
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
