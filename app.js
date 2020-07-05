@@ -16,11 +16,14 @@ const auth = require('./routes/auth');
 const config = require('config');
 const error = require('./middleware/error');
 
-// Handling uncaught exceptions (only happens outside of express)
+// Handling uncaught exceptions and rejections (only happens outside of express)
 process.on('uncaughtException', ex => {
     errDebugger('Uncaught Exception');
     errDebugger(ex);
+    process.exit(1);
 });
+
+process.on('uncaughtRejection', ex => { throw ex });
 
 // Initializing app
 const app = express();
