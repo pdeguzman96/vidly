@@ -1,0 +1,4 @@
+{
+    "nosql_uri": "mongodb://localhost/vidly-test",
+    "jwtPrivateKey": "1234"
+}
