@@ -34,15 +34,15 @@ describe('/api/genres', () => {
     describe('GET /:id', () => {
         it('should return a particular Genre by the given ID', async () => {
             const newGenre = Genre({ name: 'genre1' });
-            const savedGenre = await newGenre.save();
+            await newGenre.save();
 
-            const res = await request(server).get(`/genres/${savedGenre._id}`);
+            const res = await request(server).get(`/genres/${newGenre._id}`);
             expect(res.status).toBe(200);
             expect(res.body.name).toBe('genre1');
         });
 
         it('should return a 404 if the given ID does not exist', async () => {
-            const res = await request(server).get(`/genres/5ef572fd32320b8188d2cb23`);
+            const res = await request(server).get(`/genres/1`);
             expect(res.status).toBe(404);
         });
     });

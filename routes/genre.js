@@ -11,6 +11,7 @@ const joi = require('../validations/joi_schemas');
 const auth = require('../middleware/auth');
 // Middleware for validating admin access
 const admin = require('../middleware/admin');
+const validateObjectId = require('../middleware/validateObjectId');
 
 /**
  * Fetch all genres
@@ -28,7 +29,7 @@ router.get('/', async (req, res) => {
  * @param { String } id query string | MongoDB ID for the requested genre
  * @return { Object } Genre Object
  */
-router.get('/:id', async (req,res) => {
+router.get('/:id', validateObjectId, async (req,res) => {
     // Joi Validation
     const { error, value } = joi.basicIdSchema.validate(req.params);
     infoDebugger(value);
