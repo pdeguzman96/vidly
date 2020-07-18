@@ -16,4 +16,6 @@ require('./startup/routes')(app); // For creating routes for the APIs
 
 // Listen on a port
 const port = process.env.PORT || 5123
-app.listen(port, () => infoDebugger(`Listening on port ${port}`))
+const server = app.listen(port, () => infoDebugger(`Listening on port ${port}`))
+
+module.exports = server;
