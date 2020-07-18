@@ -49,60 +49,58 @@ describe('/api/genres', () => {
     });
 
     describe('POST /', () => {
+
+        let token;
+        let name;
+
+        /**
+         * Utiltiy template function for sending POST requests
+         */
+        const execPath = async () => {
+            return await request(server)
+            .post('/genres')
+            .set('x-auth-token', token)
+            .send({ name })
+        };
+
+        /**
+         * Automatically set parameters for the happy path before each test
+         */
+        beforeEach(() => {
+            // Log in - generate auth token and include in req header
+            token = new User().generateAuthToken();
+            name = 'genre1';
+        })
+
         it('should return a 401 if client is not logged in', async () => {
-            const res = await request(server)
-                .post('/genres')
-                .send({name: 'genre1'});
+            // Unset token
+            token = ''
+            const res = await execPath()
             expect(res.status).toBe(401);
         });
 
         it('should return a 400 if the given genre is less than 2 chars', async () => {
-            // Log in - generate auth token and include in req header
-            const token = new User().generateAuthToken();
-
-            const res = await request(server)
-                .post('/genres')
-                .set('x-auth-token', token)
-                .send({name: '1'});
+            name = '1'
+            const res = await execPath();
             expect(res.status).toBe(400);
         });
 
         it('should return a 400 if the given genre is more than 20 chars', async () => {
-            // Log in - generate auth token and include in req header
-            const token = new User().generateAuthToken();
-
-            const res = await request(server)
-                .post('/genres')
-                .set('x-auth-token', token)
-                .send({ name: new Array(22).join('a') });
+            name = new Array(22).join('a')
+            const res = await execPath();
             expect(res.status).toBe(400);
         });
 
         it('should save the genre if the given genre is valid', async () => {
-            // Log in - generate auth token and include in req header
-            const token = new User().generateAuthToken();
-
-            const res = await request(server)
-                .post('/genres')
-                .set('x-auth-token', token)
-                .send({ name: 'genre1' });
-            
+            const res = await execPath();
             const genre = await Genre.find({ name: 'genre1' });
             expect(genre).not.toBeNull();
         });
 
         it('should return the genre if the given genre is valid', async () => {
-            // Log in - generate auth token and include in req header
-            const token = new User().generateAuthToken();
-
-            const res = await request(server)
-                .post('/genres')
-                .set('x-auth-token', token)
-                .send({ name: 'genre1' });
-            
+            const res = await execPath();
             expect(res.body).toHaveProperty('_id');
             expect(res.body).toHaveProperty('name', 'genre1');
         });
-
     });
 });
