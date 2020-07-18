@@ -18,6 +18,7 @@ To properly use this app, please set the following environment variables...
 - /node_modules/: npm modules
 - /routes/: API routes build with `express`
 - /startup/: startup files for logging, config, db, etc...
+- /tests/: unit and integration tests using jest and supertest
 - /validations/: joi input validation schemas for the APIs
 - index.js: main app that initializes the web server
 
