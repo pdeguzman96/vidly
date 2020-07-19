@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { Genre } = require('../../models/genres');
 const { User } = require('../../models/users');
+const mongoose = require('mongoose');
 let server;
 
 // Overall test suites
@@ -42,8 +43,14 @@ describe('/api/genres', () => {
             expect(res.body.name).toBe('genre1');
         });
 
-        it('should return a 404 if the given ID does not exist', async () => {
+        it('should return a 404 if the given ID is invalid', async () => {
             const res = await request(server).get(`/genres/1`);
+            expect(res.status).toBe(404);
+        });
+
+        it('should return a 404 if the given ID does not exist', async () => {
+            const objId = mongoose.Types.ObjectId();
+            const res = await request(server).get(`/genres/${objId}`);
             expect(res.status).toBe(404);
         });
     });
